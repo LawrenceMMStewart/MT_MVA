@@ -6,6 +6,11 @@ from torch.autograd import Variable
 import time
 import numpy as np
 
+
+
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
+
 def clones(module, N):
     "Produce N identical layers."
     return nn.ModuleList([copy.deepcopy(module) for _ in range(N)])
@@ -116,9 +121,9 @@ def run_epoch(data_iter, model, loss_compute):
     total_loss = 0
     tokens = 0
     for i, batch in enumerate(data_iter):
-        out = model.forward(batch.src, batch.trg, 
-                            batch.src_mask, batch.trg_mask)
-        loss = loss_compute(out, batch.trg_y, batch.ntokens)
+        out = model.forward(batch.src.to(device), batch.trg.to(device), 
+                            batch.src_mask.to(device), batch.trg_mask.to(device))
+        loss = loss_compute(out, batch.trg_y.to(device), batch.ntokens)
         total_loss += loss
         total_tokens += batch.ntokens
         tokens += batch.ntokens

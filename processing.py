@@ -155,16 +155,58 @@ def tensorsFromPair(pair):
     target_tensor = tensorFromSentence(tgt_lang, pair[1])
     return (input_tensor, target_tensor)
 
-class StreamData():
+#class StreamData():
+#    def __init__(self,src_lang,tgt_lang,
+#                 text_pairs,seq_size=10,
+#                tokens_per_batch = 100,batch_size = -1):
+#        """
+#        Creates a streaming data set (sentences are combined into
+#        contiguous stream. Batching results in phrases of size
+#        seq_size with the user controlling the number of phrases per
+#        batch by either using a fixed batch size or by generating batch
+#        sizes for a user selected value for the number of tokens in a batch
+#        """
+
+#        self.src_lang = src_lang
+#        self.tgt_lang = tgt_lang
+#        raw_data = [ tensorsFromPair(t) for t in text_pairs]
+#        src =  [ a[0] for a in raw_data]
+#        tgt = [ a[1] for a in raw_data]
+
+#        #positions of sentences
+#        src_pos = np.cumsum([len(a) for a in src])
+#        self.src_pos = [0] + src_pos.tolist()
+#        tgt_pos= np.cumsum([len(a) for a in tgt])
+#        self.tgt_pos = [0]+tgt_pos.tolist()
+
+#        self.src = torch.hstack(src)
+#        self.tgt = torch.hstack(tgt)
+
+
+#    def src2phrase(self,x):
+#        return [self.src_lang.index2word[i] for i in x.tolist()]
+#    def tgt2phrase(self,x):
+#        return [self.tgt_lang.index2word[i] for i in x.tolist()]
+
+
+#    def batch_data(self,seq_size,tokens_per_batch,batch_size):
+#        assert batch_size ==-1 or tokens_per_batch == -1
+#        assert not (batch_size == -1 and tokens_per_batch == -1)
+
+#        if batch_size == -1:
+#            #batch by tokens per batch
+#            pass
+#        elif tokens_per_batch == -1:
+#            excess_ind_src = len(self.src) % seq_size
+#            excess_ind_tgt = len(self.tgt) % seq_size
+
+class BatchDataset():
     def __init__(self,src_lang,tgt_lang,
                  text_pairs,seq_size=10,
                 tokens_per_batch = 100,batch_size = -1):
         """
-        Creates a streaming data set (sentences are combined into
-        contiguous stream. Batching results in phrases of size
-        seq_size with the user controlling the number of phrases per
-        batch by either using a fixed batch size or by generating batch
-        sizes for a user selected value for the number of tokens in a batch
+        Creates a batch dataset (sorting sentences by size)
+        and padding sentences to have the max size.
         """
 
         self.src_lang = src_lang
@@ -183,12 +225,23 @@ class StreamData():
         self.tgt = torch.hstack(tgt)
 
 
-
-
     def src2phrase(self,x):
         return [self.src_lang.index2word[i] for i in x.tolist()]
     def tgt2phrase(self,x):
         return [self.tgt_lang.index2word[i] for i in x.tolist()]
+
+
+    def batch_data(self,seq_size,tokens_per_batch,batch_size):
+        assert batch_size ==-1 or tokens_per_batch == -1
+        assert not (batch_size == -1 and tokens_per_batch == -1)
+
+        if batch_size == -1:
+            #batch by tokens per batch
+            pass
+        elif tokens_per_batch == -1:
+            excess_ind_src = len(self.src) % seq_size
+            excess_ind_tgt = len(self.tgt) % seq_size
+
 
 
 

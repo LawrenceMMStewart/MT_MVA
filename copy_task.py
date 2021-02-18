@@ -68,13 +68,16 @@ if __name__ == "__main__":
     parser.add_argument('--V', default = 10 , type = int,
                     help='Size of the vocab to copy')
     parser.add_argument('--phrase_size',default = 30, type = int , help = 'size of sentences')
-    parser.add_argument('--bs',default = 30 ,type = int, help = 'batch size')
+    parser.add_argument('--bs',default = 30 ,type = int, 
+        help = 'batch size - no. sentences per batch')
     parser.add_argument('--train_size',default = 50, type = int , 
         help = 'number of batches in the train dataset')
     parser.add_argument('--eval_size',default = 30, type = int , 
         help = 'number of batches in the evaluation dataset')
     parser.add_argument('--no_epochs',default = 50, type =int,
         help = 'number of epochs for training')
+    parser.add_argument('--warmup',default = 400, type = int,
+        help = 'number of iterations till max point of lr ')
     args = parser.parse_args()
 
 
@@ -83,8 +86,8 @@ if __name__ == "__main__":
     V = args.V + 1
     criterion = LabelSmoothing(size=V, padding_idx=0, smoothing=0.0) #no smoothing here
     model = make_model(V, V, N=2).to(device)
-    model_opt = NoamOpt(model.src_embed[0].d_model, 1, 400,
-            torch.optim.Adam(model.parameters(), lr=0, betas=(0.9, 0.98), eps=1e-9))
+    model_opt = NoamOpt(model.src_embed[0].d_model, 1, args.warmup,
+            torch.optim.Adam(model.parameters(), lr=0, betas=(0.9, 0.98), eps=1e-9)) #was 400 before
 
     elapsed_time = 0
     tlosses = []
@@ -111,9 +114,10 @@ if __name__ == "__main__":
                         SimpleLossCompute(model.generator, criterion, None))
         elapsed_time = elapsed_time + train_time + eval_time 
 
-        print(f'Epoch {epoch} : TLoss = {train_loss:.2f}, TTime = {train_time:.2f} \
-            ELoss = {eval_loss:.2f}, ETime = {eval_time:.2f}, \
-            Elapsed Time = {elapsed_time:.2f}')
+        print(f'Epoch {epoch} : TLoss = {train_loss:.2f} \
+            ELoss = {eval_loss:.2f}, \
+            Elapsed Time = {elapsed_time:.2f}, \
+            Lr (start of epoch) {model_opt.self._rate:.4f}')
 
         tlosses.append(train_loss)
         elosses.append(eval_loss)
@@ -128,6 +132,7 @@ if __name__ == "__main__":
     plt.plot(elosses,label=  'eval')
     plt.legend()
     plt.grid('on')
+    plt.savefig('copy_task.png')
     plt.show()
 
 

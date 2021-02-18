@@ -117,7 +117,7 @@ if __name__ == "__main__":
         print(f'Epoch {epoch} : TLoss = {train_loss:.2f} \
             ELoss = {eval_loss:.2f}, \
             Elapsed Time = {elapsed_time:.2f}, \
-            Lr (start of epoch) {model_opt.self._rate:.4f}')
+            Lr (start of epoch) {model_opt._rate:.4f}')
 
         tlosses.append(train_loss)
         elosses.append(eval_loss)

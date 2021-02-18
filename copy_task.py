@@ -95,7 +95,7 @@ if __name__ == "__main__":
 
     train_batches  = data_gen(V, args.bs, 
         args.train_size , phrase_size = args.phrase_size)
-    eval_batches  = data_gen(V, args.bs, args.train_size,
+    eval_batches  = data_gen(V, args.bs, args.eval_size,
         phrase_size = args.phrase_size)
 
     for epoch in range(args.no_epochs):

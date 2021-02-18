@@ -120,23 +120,26 @@ def run_epoch(data_iter, model, loss_compute):
     total_tokens = 0
     total_loss = 0
     tokens = 0
+    total_acc = 0
     for i, batch in enumerate(data_iter):
         out = model.forward(batch.src.to(device), batch.trg.to(device), 
                             batch.src_mask.to(device), batch.trg_mask.to(device))
-        loss = loss_compute(out, batch.trg_y.to(device), batch.ntokens)
+        loss , acc= loss_compute(out, batch.trg_y.to(device), batch.ntokens)
         total_loss += loss
         total_tokens += batch.ntokens
         tokens += batch.ntokens
-        # if i % 50 == 1:
-        #     elapsed = time.time() - start
-        #     print("Epoch Step: %d Loss: %f Tokens per Sec: %f" %
-        #             (i, loss / batch.ntokens, tokens / elapsed))
-        #     start = time.time()
-        #     tokens = 0
+        total_acc += acc
+        if i % 50 == 0:
+            # elapsed = time.time() - start
+            # print("Epoch Step: %d Loss: %f Tokens per Sec: %f" %
+            #         (i, loss / batch.ntokens, tokens / elapsed))
+            start = time.time()
+            tokens = 0
     elapsed_time = time.time() - start
     epoch_loss = total_loss / total_tokens
+    epoch_acc = total_acc / total_tokens
 
-    return epoch_loss.item() , elapsed_time 
+    return epoch_loss.item() , epoch_acc, elapsed_time 
 
 
 

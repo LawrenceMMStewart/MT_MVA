@@ -41,7 +41,11 @@ class SimpleLossCompute:
         if self.opt is not None:
             self.opt.step()
             self.opt.optimizer.zero_grad()
-        return loss.item() * norm
+
+        #calculate acc
+        acc = x.contiguous().view(-1, x.size(-1)).argmax(dim=1) == y.contiguous().view(-1) 
+        acc = acc.sum().item()
+        return loss.item() * norm, acc
 
 
 
@@ -92,6 +96,8 @@ if __name__ == "__main__":
     elapsed_time = 0
     tlosses = []
     elosses = []
+    taccs = []
+    eacss = []
 
     train_batches  = data_gen(V, args.bs, 
         args.train_size , phrase_size = args.phrase_size)
@@ -106,23 +112,25 @@ if __name__ == "__main__":
         #Train the model
         model.train()
 
-        train_loss ,train_time = run_epoch(train_set, model, 
+        train_loss ,train_acc, train_time = run_epoch(train_set, model, 
                   SimpleLossCompute(model.generator, criterion, model_opt))
 
         #Eval the model
         model.eval()
 
-        eval_loss, eval_time = run_epoch(eval_set, model, 
+        eval_loss, eval_acc,eval_time = run_epoch(eval_set, model, 
                         SimpleLossCompute(model.generator, criterion, None))
         elapsed_time = elapsed_time + train_time + eval_time 
 
-        print(f'Epoch {epoch} : TLoss = {train_loss:.4f} \
-            ELoss = {eval_loss:.4f}, \
+        print(f'Epoch {epoch} : TLoss = {train_loss:.4f} , Tacc= {train_acc:.2f} \
+            ELoss = {eval_loss:.4f}, Eacc = {eval_acc:.2f}, \
             Elapsed Time = {elapsed_time:.1f}, \
             Lr (start of epoch) {model_opt._rate:.4f}')
 
         tlosses.append(train_loss)
         elosses.append(eval_loss)
+        taccs.append(train_acc)
+        eacss.append(eval_acc)
 
 
 
@@ -134,9 +142,21 @@ if __name__ == "__main__":
     plt.plot(elosses,label=  'eval')
     plt.legend()
     plt.grid('on')
-    plt.savefig('copy_task.png')
+    plt.savefig('copy_task_losses.png')
     plt.show()
 
+
+
+    plt.figure()
+    plt.style.use('ggplot')
+    plt.xlabel("Epoch")
+    plt.ylabel("acc")
+    plt.plot(taccs,label = 'Train')
+    plt.plot(eacss,label=  'eval')
+    plt.legend()
+    plt.grid('on')
+    plt.savefig('copy_task_accs.png')
+    plt.show()
 
 
     # model.eval()

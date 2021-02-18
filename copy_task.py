@@ -65,7 +65,7 @@ def greedy_decode(model, src, src_mask, max_len, start_symbol):
 if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser(description='Toy tasks')
-    parser.add_argument('--V', default = 10 , type = int
+    parser.add_argument('--V', default = 10 , type = int,
                     help='Size of the vocab to copy')
     parser.add_argument('--phrase_size',default = 30, type = int , help = 'size of sentences')
     parser.add_argument('--bs',default = 30 ,type = int, help = 'batch size')

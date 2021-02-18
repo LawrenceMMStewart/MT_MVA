@@ -1,4 +1,5 @@
-from __future__ import unicode_literals, print_function, division
+f
+om __future__ import unicode_literals, print_function, division
 from io import open
 import unicodedata
 import string

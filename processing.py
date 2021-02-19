@@ -1,5 +1,4 @@
-f
-om __future__ import unicode_literals, print_function, division
+from __future__ import unicode_literals, print_function, division
 from io import open
 import unicodedata
 import string
@@ -247,5 +246,5 @@ class BatchDataset():
 
 
 src_lang, tgt_lang, pairs = prepareData('eng', 'fra', True)
-dat = StreamData(src_lang,tgt_lang,pairs,12)
+# dat = StreamData(src_lang,tgt_lang,pairs,12)
 import pdb; pdb.set_trace()

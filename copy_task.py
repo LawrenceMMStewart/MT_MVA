@@ -166,7 +166,7 @@ if __name__ == "__main__":
     eval_batches  = data_gen(V, args.bs, args.eval_size,
         phrase_size = args.phrase_size)
 
-    import pdb; pdb.set_trace()
+
 
     for epoch in range(args.no_epochs):
 

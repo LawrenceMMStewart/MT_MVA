@@ -53,6 +53,25 @@ def identity_varied_size_gen(V, batch, nbatches,phrase_size = 10):
         # yield Batch(src, tgt, 0)
     return all_batches
 
+def reverse_gen(V, batch, nbatches,phrase_size = 10):
+    """reverses the sequence"""
+    all_batches = []
+    for i in range(nbatches):
+        data =np.random.randint(1, V, size=(batch, 
+            phrase_size + 1))
+        data[:, 0] = 1
+        targets = np.copy(data)
+        targets[:,1:]  = targets[:,data.shape[1]:0:-1]
+
+        data = torch.from_numpy(data)
+        targets = torch.from_numpy(targets)
+
+        src = Variable(data, requires_grad=False)
+        tgt = Variable(targets, requires_grad=False)
+        all_batches.append((src,tgt))
+        # yield Batch(src, tgt, 0)
+    return all_batches
+
 class SimpleLossCompute:
     "A simple loss compute and train function."
     def __init__(self, generator, criterion, opt=None):
@@ -134,17 +153,20 @@ if __name__ == "__main__":
         data_gen = identity_gen
     elif args.task == 'id_varied':
         data_gen = identity_varied_size_gen
+    elif args.task  == 'reverse':
+        data_gen = reverse_gen
     else:
         raise Exception("Please select a valid task")
 
     
-    print(f'--Running {args.task}')
+    print(f'--Running Task: {args.task} --')
 
     train_batches  = data_gen(V, args.bs, 
         args.train_size , phrase_size = args.phrase_size)
     eval_batches  = data_gen(V, args.bs, args.eval_size,
         phrase_size = args.phrase_size)
 
+    import pdb; pdb.set_trace()
 
     for epoch in range(args.no_epochs):
 

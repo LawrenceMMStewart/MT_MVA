@@ -13,13 +13,40 @@ def create_dataset(all_batches):
     for src,tgt in all_batches:
         yield Batch(src, tgt, 0)
 
-def data_gen(V, batch, nbatches,phrase_size = 10):
-    "Generate random data for a src-tgt copy task."
+def identity_gen(V, batch, nbatches,phrase_size = 10):
+    """Generates data sampled from the identity function"""
     all_batches = []
     for i in range(nbatches):
         data = torch.from_numpy(np.random.randint(1, V, size=(batch, 
             phrase_size + 1)))
         data[:, 0] = 1
+
+        src = Variable(data, requires_grad=False)
+        tgt = Variable(data, requires_grad=False)
+        all_batches.append((src,tgt))
+        # yield Batch(src, tgt, 0)
+    return all_batches
+
+
+def identity_varied_size_gen(V, batch, nbatches,phrase_size = 10):
+    """Generates data sampled from the identity function
+    with varied size of phrases (to test padding works)"""
+    all_batches = []
+    for i in range(nbatches):
+        data =np.random.randint(1, V, size=(batch, 
+            phrase_size + 1))
+        data[:, 0] = 1
+
+        #cut sentences to random sizes
+        inds = np.random.randint(1,data.shape[1]+1,(data.shape[0],1))
+        inds = inds.repeat(data.shape[1],axis=1)
+        pos = np.vstack([np.arange(0,inds.shape[1])]*inds.shape[0])
+        inds = np.where(pos>inds)
+
+        
+        data[inds] = 0 #change some things to padding 
+        data = torch.from_numpy(data)
+
         src = Variable(data, requires_grad=False)
         tgt = Variable(data, requires_grad=False)
         all_batches.append((src,tgt))
@@ -82,7 +109,11 @@ if __name__ == "__main__":
         help = 'number of epochs for training')
     parser.add_argument('--warmup',default = 400, type = int,
         help = 'number of iterations till max point of lr ')
+    parser.add_argument('--task',default = 'id',type=str,
+        help = 'task to solve ops : id , id_varied ')
     args = parser.parse_args()
+
+
 
 
 
@@ -99,10 +130,21 @@ if __name__ == "__main__":
     taccs = []
     eacss = []
 
+    if args.task == 'id':
+        data_gen = identity_gen
+    elif args.task == 'id_varied':
+        data_gen = identity_varied_size_gen
+    else:
+        raise Exception("Please select a valid task")
+
+    
+    print(f'--Running {args.task}')
+
     train_batches  = data_gen(V, args.bs, 
         args.train_size , phrase_size = args.phrase_size)
     eval_batches  = data_gen(V, args.bs, args.eval_size,
         phrase_size = args.phrase_size)
+
 
     for epoch in range(args.no_epochs):
 
@@ -142,7 +184,7 @@ if __name__ == "__main__":
     plt.plot(elosses,label=  'eval')
     plt.legend()
     plt.grid('on')
-    plt.savefig('copy_task_losses.png')
+    plt.savefig(f'{args.task}_losses.png')
     plt.show()
 
 
@@ -155,7 +197,7 @@ if __name__ == "__main__":
     plt.plot(eacss,label=  'eval')
     plt.legend()
     plt.grid('on')
-    plt.savefig('copy_task_accs.png')
+    plt.savefig(f'{args.task}_accs.png')
     plt.show()
 
 

@@ -4,7 +4,7 @@ import unicodedata
 import string
 import re
 import random
-
+import tqdm
 import numpy as np
 import torch
 import torch.nn as nn
@@ -200,6 +200,7 @@ class BatchDataset():
         self.src = torch.hstack(src)
         self.tgt = torch.hstack(tgt)
 
+    
 
     def src2phrase(self,x):
         return [self.src_lang.index2word[i] for i in x.tolist()]
@@ -217,24 +218,33 @@ class BatchDataset():
         no_batches = len(self.src_lens) // bs
         excess = len(self.src_lens) % bs 
         batches = []
-        for bid in range(no_batches):
+        for bid in tqdm.tqdm(range(no_batches),desc = "Batching data"):
             #normal batch
             if bid!= no_batches - 1 :
-                #max sizes for padding sentences
-                src_max_len = max(self.src_lens[bs*bid:bs*(bid+1)])
-                tgt_max_len = max(self.tgt_lens[bs*bid:bs*(bid+1)])
+                bs_ = bs 
+            else:
+                #bs_ is a dummy variable used to deal with the extra sized batch
+                bs_ = bs + excess
+                
 
-                #src sentences have length = max +  1 (for EOS)
-                src_batch = torch.ones((no_batches,src_max_len+1))* PAD_TOKEN
-                #tgt sentences have length = max + 1 (for SOS and EOS)
-                tgt_batch = torch.ones((no_batches,tgt_max_len+2))* PAD_TOKEN
 
-                #set SOS token for tgt batch
-                tgt_batch[:,0] = SOS_TOKEN
+            #max sizes for padding sentences
+            # src_max_len = max(self.src_lens[bs*bid:bs*(bid+1)])
+            # tgt_max_len = max(self.tgt_lens[bs*bid:bs*(bid+1)])
+            src_max_len = max(self.src_lens[bs*bid:bs*bid+bs_])
+            tgt_max_len = max(self.tgt_lens[bs*bid:bs*bid+bs_])
+            #src sentences have length = max +  1 (for EOS)
+            src_batch = torch.ones((bs_,src_max_len+1))* PAD_TOKEN
+            #tgt sentences have length = max + 1 (for SOS and EOS)
+            tgt_batch = torch.ones((bs_,tgt_max_len+2))* PAD_TOKEN
 
-  
-                for pid in range(bs):
-                    
+            #set SOS token for tgt batch
+            tgt_batch[:,0] = SOS_TOKEN
+
+            try:
+
+                for pid in range(bs_):
+                
                     #find position of src_phrase in contigous array
                     src_start,src_end = self.src_pos[bid*bs+pid : bid*bs+pid+2]
                     #extract tensor of sentence
@@ -253,21 +263,21 @@ class BatchDataset():
                     tgt_batch[pid,1:pl+1] = phrase_tgt
                     tgt_batch[pid,pl+1] = EOS_TOKEN
 
-                import pdb; pdb.set_trace()
-            #final batch will be larger as it contains excess phrases
-            else:
-                pass
+                batches.append( (src_batch,tgt_batch))
+            except:
+                print("error")
 
 
 
-
+        return batches
 
 if __name__=="__main__":
 
-    src_lang, tgt_lang, pairs = prepareData('eng', 'fra', True)
-    dat = BatchDataset(src_lang,tgt_lang,pairs)
-    dat.batch_data()
+    src_lang, tgt_lang, pairs = prepareData('eng', 'fra', reverse=True)
 
+    dat = BatchDataset(src_lang,tgt_lang,pairs)
+    batches = dat.batch_data()
+    import pdb; pdb.set_trace()
 
 #class StreamData():
 #    def __init__(self,src_lang,tgt_lang,

@@ -154,10 +154,28 @@ def phrase_to_tensor(lang, sentence):
     return torch.tensor(indexes, dtype=torch.long, device=device)
     return indexes
 
-def pair_to_tensor(pair):
+def pair_to_tensor(pair,src_lang,tgt_lang):
     input_arr = phrase_to_tensor(src_lang, pair[0])
     target_arr = phrase_to_tensor(tgt_lang, pair[1])
     return (input_arr, target_arr)
+
+def shuffle_split(pairs,split = 0.1):
+    """
+    Splits pairs of sentences into train and
+    validation sets (shuffling them)
+
+    split  = fraction of data to be assigned to validation set
+    """
+    ids = np.arange(len(pairs))
+    np.random.shuffle(ids)
+    split_id = int(len(ids)*(1-split))
+
+    train_ids = ids[:split_id]
+    valid_ids = ids[split_id:]
+
+    train_pairs = [pairs[i] for i in train_ids]
+    valid_pairs = [pairs[i] for i in valid_ids]
+    return train_pairs, valid_pairs
 
 
 
@@ -172,7 +190,8 @@ class BatchDataset():
 
         self.src_lang = src_lang
         self.tgt_lang = tgt_lang
-        raw_data = [ pair_to_tensor(t) for t in text_pairs]
+        raw_data = [ pair_to_tensor(t,src_lang,
+            tgt_lang) for t in text_pairs]
         src = [ a[0] for a in raw_data]
         tgt = [ a[1] for a in raw_data] 
 
@@ -271,14 +290,26 @@ class BatchDataset():
 
         return batches
 
+    def batch2phrases(self,src_batch,tgt_batch):
+        """
+        For sanity checks
+        """
+        assert len(src_batch) == len(tgt_batch)
+        for i in range(len(src_batch)):
+            print(self.src2phrase(src_batch[i]))
+            print(self.tgt2phrase(tgt_batch[i]))
+            print("\n")
+
 if __name__=="__main__":
-
-    src_lang, tgt_lang, pairs = prepareData('eng', 'fra', reverse=True)
-
-    dat = BatchDataset(src_lang,tgt_lang,pairs)
-    batches = dat.batch_data()
+    np.random.seed(123)
+    src_lang, tgt_lang, pairs = prepareData('eng', 'fra', 
+        reverse=True,max_len = 12)
+    train_pairs , valid_pairs = shuffle_split(pairs)
+    train = BatchDataset(src_lang,tgt_lang,train_pairs)
+    valid = BatchDataset(src_lang,tgt_lang,valid_pairs)
+    train_batches = train.batch_data()
+    valid_batches =  valid.batch_data()
     import pdb; pdb.set_trace()
-
 #class StreamData():
 #    def __init__(self,src_lang,tgt_lang,
 #                 text_pairs,seq_size=10,

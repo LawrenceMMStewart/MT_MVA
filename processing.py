@@ -253,9 +253,9 @@ class BatchDataset():
             src_max_len = max(self.src_lens[bs*bid:bs*bid+bs_])
             tgt_max_len = max(self.tgt_lens[bs*bid:bs*bid+bs_])
             #src sentences have length = max +  1 (for EOS)
-            src_batch = torch.ones((bs_,src_max_len+1))* PAD_TOKEN
+            src_batch = torch.ones((bs_,src_max_len+1),dtype = torch.long)* PAD_TOKEN
             #tgt sentences have length = max + 1 (for SOS and EOS)
-            tgt_batch = torch.ones((bs_,tgt_max_len+2))* PAD_TOKEN
+            tgt_batch = torch.ones((bs_,tgt_max_len+2),dtype = torch.long)* PAD_TOKEN
 
             #set SOS token for tgt batch
             tgt_batch[:,0] = SOS_TOKEN

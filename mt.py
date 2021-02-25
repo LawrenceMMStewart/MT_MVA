@@ -63,14 +63,15 @@ if __name__ == "__main__":
     train = BatchDataset(src_lang,tgt_lang,train_pairs)
     valid = BatchDataset(src_lang,tgt_lang,valid_pairs)
     train_batches = train.batch_data()
-    valid_batches =  valid.batch_data()
+    eval_batches =  valid.batch_data()
 
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     #IS THIS CORRECT I DONT KNOW PLEASE CHECK 
-    V = tgt_lang.n_words
-    criterion = LabelSmoothing(size=V, padding_idx=0, smoothing=0.0) #no smoothing here
-    model = make_model(V, V, N=args.no_units).to(device)
+    V_src = src_lang.n_words
+    V_tgt = tgt_lang.n_words
+    criterion = LabelSmoothing(size=V_tgt, padding_idx=0, smoothing=0.0) #no smoothing here
+    model = make_model(V_src, V_tgt, N=args.no_units).to(device)
     model_opt = NoamOpt(model.src_embed[0].d_model, 1, args.warmup,
             torch.optim.Adam(model.parameters(), lr=0, betas=(0.9, 0.98), eps=1e-9)) #was 400 before
 

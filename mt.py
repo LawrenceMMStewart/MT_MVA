@@ -73,7 +73,7 @@ if __name__ == "__main__":
     criterion = LabelSmoothing(size=V_tgt, padding_idx=0, smoothing=0.0) #no smoothing here
     model = make_model(V_src, V_tgt, N=args.no_units).to(device)
     model_opt = NoamOpt(model.src_embed[0].d_model, 1, args.warmup,
-            torch.optim.Adam(model.parameters(), lr=0, betas=(0.9, 0.98), eps=1e-9)) #was 400 before
+            torch.optim.Adam(model.parameters(), lr=0, betas=(0.9, 0.98), eps=1e-9)) 
 
     elapsed_time = 0
     tlosses = []
@@ -81,7 +81,7 @@ if __name__ == "__main__":
     taccs = []
     eacss = []
 
-
+    import pdb; pdb.set_trace()
     for epoch in range(args.no_epochs):
 
         train_set =  create_dataset(train_batches)

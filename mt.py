@@ -120,7 +120,7 @@ if __name__ == "__main__":
         eval_loss, eval_acc = run_epoch(eval_set, model, 
                         SimpleLossCompute(model.generator, criterion, None))
     
-        elapsed_time = time.time() - start_time()
+        elapsed_time = time.time() - start_time
         print(f'Epoch {epoch} : TLoss = {train_loss:.4f} , Tacc = {train_acc:.2f}, TrainPP={np.exp(train_loss):.2f}\
             ELoss = {eval_loss:.4f}, Eacc = {eval_acc:.2f}, EvalPP = {np.exp(train_loss):.2f}\
             Elapsed Time = {elapsed_time:.1f}, \

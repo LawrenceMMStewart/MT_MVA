@@ -103,7 +103,7 @@ class LabelSmoothing(nn.Module):
 
 
 
-def run_epoch(data_iter, model, loss_compute):
+def run_epoch(data_iter, model, loss_compute,desc = ""):
     """
     runs one training epoch of a dataset
 

@@ -9,6 +9,8 @@ import seaborn
 from utils import *
 from transformer import *
 from processing import *
+import os 
+import json
 
 def create_dataset(all_batches):
     for src,tgt in all_batches:
@@ -38,7 +40,7 @@ UNK_TOKEN = 3
 if __name__ == "__main__":
     import argparse
 
-    parser = argparse.ArgumentParser(description='Toy tasks')
+    parser = argparse.ArgumentParser(description='Machine Translation Training ; Fr -> Eng')
     parser.add_argument("--seed",default=123,type=int,help= "seed for experiment")
     parser.add_argument('--max_size',default = 20, type = int , help = 'max size of sentences')
     parser.add_argument("--split", default = 0.1 ,type = float,
@@ -49,13 +51,30 @@ if __name__ == "__main__":
         help = 'number of epochs for training')
     parser.add_argument("--no_units",default = 6,type=int,
         help = 'number of encoder decoder units to stack')
+    parser.add_argument("--dropout", default = 0.1 ,type = float,
+        help = "dropout for encoder decoder")
+    parser.add_argument("--d_model", default = 512, type = int,
+        help = "dimension of the transformer model")
+    parser.add_argument("--no_heads", default = 8 ,type = int,
+        help = "number of heads in multi-attention")
     parser.add_argument('--warmup',default = 4000, type = int,
         help = 'number of iterations till max point of lr ')
+    parser.add_argument("--smoothing", default = 0.0 , type = float,
+        help = "smoothing coeffecient into label smoothing (between 0-1)")
+    parser.add_argument("--exp_name",default = "test",type = str,
+        help = "Name of experiment, to save plots")
     args = parser.parse_args()
 
-
-
     np.random.seed(args.seed)
+
+    #create output folder:
+    PATH = f'results/{args.exp_name}'
+    assert not os.path.isdir(PATH) ; "exp already exists"
+    os.mkdir(PATH)
+    with open(PATH+'/params.json','w') as f:
+        f.write(json.dumps(vars(args)))
+
+
     #load data
     src_lang, tgt_lang, pairs = prepareData('eng', 'fra', 
         reverse=True,max_len = args.max_size)
@@ -71,7 +90,11 @@ if __name__ == "__main__":
     V_src = src_lang.n_words
     V_tgt = tgt_lang.n_words
     criterion = LabelSmoothing(size=V_tgt, padding_idx=0, smoothing=0.0) #no smoothing here
-    model = make_model(V_src, V_tgt, N=args.no_units).to(device)
+
+    model = make_model(V_src, V_tgt, N=args.no_units,
+        d_model = args.d_model, h = args.no_heads,
+        dropout = args.dropout).to(device)
+
     model_opt = NoamOpt(model.src_embed[0].d_model, 1, args.warmup,
             torch.optim.Adam(model.parameters(), lr=0, betas=(0.9, 0.98), eps=1e-9)) 
 
@@ -119,7 +142,7 @@ if __name__ == "__main__":
     plt.plot(elosses,label=  'eval')
     plt.legend()
     plt.grid('on')
-    plt.savefig(f'{args.task}_losses.png')
+    plt.savefig(PATH + '/losses.png')
     plt.show()
 
 
@@ -132,7 +155,7 @@ if __name__ == "__main__":
     plt.plot(eacss,label=  'eval')
     plt.legend()
     plt.grid('on')
-    plt.savefig(f'{args.task}_accs.png')
+    plt.savefig(PATH + '/accs.png')
     plt.show()
 
 

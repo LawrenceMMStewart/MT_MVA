@@ -129,7 +129,7 @@ if __name__ == "__main__":
     parser.add_argument('--warmup',default = 400, type = int,
         help = 'number of iterations till max point of lr ')
     parser.add_argument('--task',default = 'id',type=str,
-        help = 'task to solve ops : id , id_varied ')
+        help = 'task to solve ops : id , id_varied, reverse')
     args = parser.parse_args()
 
 

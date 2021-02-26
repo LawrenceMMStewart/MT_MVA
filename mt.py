@@ -178,12 +178,12 @@ if __name__ == "__main__":
     params['epps'] = np.exp(elosses).tolist()
 
     #epoch id where model performs best and value:
-    params['best_acc'] = min(eacss)
-    params['best_loss'] = min(elosses)
-    params['best_ppl'] = min(np.exp(elosses).tolist())
-    params['best_id']  = np.argmin(np.exp(elosses))
-
-
+    params['best_acc'] = float(min(eacss))
+    params['best_loss'] = float(min(elosses))
+    params['best_ppl'] = float(min(np.exp(elosses).tolist()))
+    params['best_id']  = float(np.argmin(np.exp(elosses)))
+    print(params)
+    import pdb ;pdb.set_trace()
     #save the experiment parameters and losses
     with open(PATH+'/params.json','w') as f:
         json.dump(params,f)

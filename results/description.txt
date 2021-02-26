@@ -1,0 +1,1 @@
+Each folder contains and experiment folder. To see the details of the experiment, please read the json file consisting the parameters.

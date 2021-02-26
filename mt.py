@@ -186,7 +186,7 @@ if __name__ == "__main__":
 
     #save the experiment parameters and losses
     with open(PATH+'/params.json','w') as f:
-        f.write(json.dumps(params))
+        json.dump(params,f)
     torch.save(model.state_dict(), PATH+'/model.pth')
 
 

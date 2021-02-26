@@ -178,6 +178,7 @@ if __name__ == "__main__":
         params['elosses'] = elosses
         params['eacss'] = eacss
         params['epps'] = np.exp(elosses)
+        import pdb; pdb.set_trace()
         f.write(json.dumps(params))
     torch.save(model.state_dict(), PATH+'/model.pth')
 

@@ -169,16 +169,18 @@ if __name__ == "__main__":
     plt.savefig(PATH + '/pps.png')
     plt.show()
 
+    params = vars(args)
+    params['tlosses'] = tlosses
+    params['taccs'] = taccs
+    params['tpps'] = np.exp(tlosses)
+    params['elosses'] = elosses
+    params['eacss'] = eacss
+    params['epps'] = np.exp(elosses)
+    print("params")
+    print(params)
+    import pdb; pdb.set_trace()
     #save the experiment parameters and losses
     with open(PATH+'/params.json','w') as f:
-        params = vars(args)
-        params['tlosses'] = tlosses
-        params['taccs'] = taccs
-        params['tpps'] = np.exp(tlosses)
-        params['elosses'] = elosses
-        params['eacss'] = eacss
-        params['epps'] = np.exp(elosses)
-        import pdb; pdb.set_trace()
         f.write(json.dumps(params))
     torch.save(model.state_dict(), PATH+'/model.pth')
 

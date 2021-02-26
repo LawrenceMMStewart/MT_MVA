@@ -140,7 +140,7 @@ def run_epoch(data_iter, model, loss_compute,desc = ""):
     epoch_loss = total_loss / total_tokens
     epoch_acc = total_acc / total_tokens
 
-    return epoch_loss.item() , epoch_acc
+    return epoch_loss.item() , epoch_acc.item()
 
 
 class SimpleLossCompute:

@@ -162,8 +162,8 @@ if __name__ == "__main__":
     plt.style.use('ggplot')
     plt.xlabel("Epoch")
     plt.ylabel("Perplexity")
-    plt.plot(xvals,np.exp(tlosses),label = 'Train')
-    plt.plot(xvals,np.exp(elosses),label=  'eval')
+    plt.plot(xvals,np.exp(tlosses).tolist(),label = 'Train')
+    plt.plot(xvals,np.exp(elosses).tolist(),label= 'eval')
     plt.legend()
     plt.grid('on')
     plt.savefig(PATH + '/pps.png')
@@ -172,13 +172,10 @@ if __name__ == "__main__":
     params = vars(args)
     params['tlosses'] = tlosses
     params['taccs'] = taccs
-    params['tpps'] = np.exp(tlosses)
+    params['tpps'] = np.exp(tlosses).tolist()
     params['elosses'] = elosses
     params['eacss'] = eacss
-    params['epps'] = np.exp(elosses)
-    print("params")
-    print(params)
-    import pdb; pdb.set_trace()
+    params['epps'] = np.exp(elosses).tolist()
     #save the experiment parameters and losses
     with open(PATH+'/params.json','w') as f:
         f.write(json.dumps(params))

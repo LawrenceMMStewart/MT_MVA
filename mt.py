@@ -176,6 +176,14 @@ if __name__ == "__main__":
     params['elosses'] = elosses
     params['eacss'] = eacss
     params['epps'] = np.exp(elosses).tolist()
+
+    #epoch id where model performs best and value:
+    params['best_acc'] = min(eacss)
+    params['best_loss'] = min(elosses)
+    params['best_ppl'] = min(np.exp(elosses).tolist())
+    params['best_id']  = np.argmin(np.exp(elosses))
+
+
     #save the experiment parameters and losses
     with open(PATH+'/params.json','w') as f:
         f.write(json.dumps(params))

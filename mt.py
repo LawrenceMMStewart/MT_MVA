@@ -132,13 +132,14 @@ if __name__ == "__main__":
         eacss.append(eval_acc)
 
 
+    xvals = [i+1 for i in range(len(tlosses))]
 
     plt.figure()
     plt.style.use('ggplot')
     plt.xlabel("Epoch")
     plt.ylabel("Loss")
-    plt.plot(tlosses,label = 'Train')
-    plt.plot(elosses,label=  'eval')
+    plt.plot(xvals,tlosses,label = 'Train')
+    plt.plot(xvals,elosses,label=  'eval')
     plt.legend()
     plt.grid('on')
     plt.savefig(PATH + '/losses.png')
@@ -150,8 +151,8 @@ if __name__ == "__main__":
     plt.style.use('ggplot')
     plt.xlabel("Epoch")
     plt.ylabel("Accuracy")
-    plt.plot(taccs,label = 'Train')
-    plt.plot(eacss,label=  'eval')
+    plt.plot(xvals,taccs,label = 'Train')
+    plt.plot(xvals,eacss,label=  'eval')
     plt.legend()
     plt.grid('on')
     plt.savefig(PATH + '/accs.png')
@@ -161,8 +162,8 @@ if __name__ == "__main__":
     plt.style.use('ggplot')
     plt.xlabel("Epoch")
     plt.ylabel("Perplexity")
-    plt.plot(np.exp(tlosses),label = 'Train')
-    plt.plot(np.exp(elosses),label=  'eval')
+    plt.plot(xvals,np.exp(tlosses),label = 'Train')
+    plt.plot(xvals,np.exp(elosses),label=  'eval')
     plt.legend()
     plt.grid('on')
     plt.savefig(PATH + '/pps.png')

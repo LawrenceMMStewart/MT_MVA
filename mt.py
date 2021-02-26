@@ -181,9 +181,8 @@ if __name__ == "__main__":
     params['best_acc'] = float(min(eacss))
     params['best_loss'] = float(min(elosses))
     params['best_ppl'] = float(min(np.exp(elosses).tolist()))
-    params['best_id']  = float(np.argmin(np.exp(elosses)))
-    print(params)
-    import pdb ;pdb.set_trace()
+    params['best_id']  = int(np.argmin(np.exp(elosses)))
+
     #save the experiment parameters and losses
     with open(PATH+'/params.json','w') as f:
         json.dump(params,f)

@@ -116,7 +116,7 @@ def run_epoch(data_iter, model, loss_compute,desc = ""):
     where out is a tensor, batch_trg_y is a tensor 
     and batch.ntokens is an integer.
     """
-    start = time.time()
+    # start = time.time()
     total_tokens = 0
     total_loss = 0
     tokens = 0
@@ -130,17 +130,17 @@ def run_epoch(data_iter, model, loss_compute,desc = ""):
         total_tokens += batch.ntokens
         tokens += batch.ntokens
         total_acc += acc
-        if i % 50 == 0:
-            # elapsed = time.time() - start
-            # print("Epoch Step: %d Loss: %f Tokens per Sec: %f" %
-            #         (i, loss / batch.ntokens, tokens / elapsed))
-            start = time.time()
-            tokens = 0
-    elapsed_time = time.time() - start
+        # if i % 50 == 0:
+        #     # elapsed = time.time() - start
+        #     # print("Epoch Step: %d Loss: %f Tokens per Sec: %f" %
+        #     #         (i, loss / batch.ntokens, tokens / elapsed))
+        #     start = time.time()
+        #     tokens = 0
+    # elapsed_time = time.time() - start
     epoch_loss = total_loss / total_tokens
     epoch_acc = total_acc / total_tokens
 
-    return epoch_loss.item() , epoch_acc, elapsed_time 
+    return epoch_loss.item() , epoch_acc
 
 
 class SimpleLossCompute:

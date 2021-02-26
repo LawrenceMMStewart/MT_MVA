@@ -71,8 +71,6 @@ if __name__ == "__main__":
     PATH = f'results/{args.exp_name}'
     assert not os.path.isdir(PATH) ; "exp already exists"
     os.mkdir(PATH)
-    with open(PATH+'/params.json','w') as f:
-        f.write(json.dumps(vars(args)))
 
 
     #load data
@@ -122,8 +120,8 @@ if __name__ == "__main__":
                         SimpleLossCompute(model.generator, criterion, None))
         elapsed_time = elapsed_time + train_time + eval_time 
 
-        print(f'Epoch {epoch} : TLoss = {train_loss:.4f} , Tacc= {train_acc:.2f} \
-            ELoss = {eval_loss:.4f}, Eacc = {eval_acc:.2f}, \
+        print(f'Epoch {epoch} : TLoss = {train_loss:.4f} , Tacc = {train_acc:.2f}, TrainPP={np.exp(train_loss):.2f}\
+            ELoss = {eval_loss:.4f}, Eacc = {eval_acc:.2f}, EvalPP = {np.exp(train_loss):.2f}\
             Elapsed Time = {elapsed_time:.1f}, \
             Lr (start of epoch) {model_opt._rate:.4f}')
 
@@ -157,6 +155,29 @@ if __name__ == "__main__":
     plt.grid('on')
     plt.savefig(PATH + '/accs.png')
     plt.show()
+
+    plt.figure()
+    plt.style.use('ggplot')
+    plt.xlabel("Epoch")
+    plt.ylabel("pp")
+    plt.plot(np.exp(tlosses),label = 'Train')
+    plt.plot(np.exp(elosses),label=  'eval')
+    plt.legend()
+    plt.grid('on')
+    plt.savefig(PATH + '/pps.png')
+    plt.show()
+
+    #save the experiment parameters and losses
+    with open(PATH+'/params.json','w') as f:
+        params = vars(args)
+        params['tlosses'] = tlosses
+        params['taccs'] = taccs
+        params['tpps'] = np.exp(tlosses)
+        params['elosses'] = elosses
+        params['eaccs'] = eaccs
+        params['epps'] = np.exp(elosses)
+        f.write(json.dumps(vars(args)))
+    torch.save(model.state_dict(), PATH+'/model.pth')
 
 
     # model.eval()

@@ -149,7 +149,7 @@ if __name__ == "__main__":
     plt.figure()
     plt.style.use('ggplot')
     plt.xlabel("Epoch")
-    plt.ylabel("acc")
+    plt.ylabel("Accuracy")
     plt.plot(taccs,label = 'Train')
     plt.plot(eacss,label=  'eval')
     plt.legend()
@@ -160,7 +160,7 @@ if __name__ == "__main__":
     plt.figure()
     plt.style.use('ggplot')
     plt.xlabel("Epoch")
-    plt.ylabel("pp")
+    plt.ylabel("Perplexity")
     plt.plot(np.exp(tlosses),label = 'Train')
     plt.plot(np.exp(elosses),label=  'eval')
     plt.legend()
@@ -175,7 +175,7 @@ if __name__ == "__main__":
         params['taccs'] = taccs
         params['tpps'] = np.exp(tlosses)
         params['elosses'] = elosses
-        params['eaccs'] = eaccs
+        params['eacss'] = eacss
         params['epps'] = np.exp(elosses)
         f.write(json.dumps(vars(args)))
     torch.save(model.state_dict(), PATH+'/model.pth')

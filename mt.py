@@ -178,7 +178,7 @@ if __name__ == "__main__":
     params['epps'] = np.exp(elosses).tolist()
 
     #epoch id where model performs best and value:
-    params['best_acc'] = float(min(eacss))
+    params['best_acc'] = float(max(eacss))
     params['best_loss'] = float(min(elosses))
     params['best_ppl'] = float(min(np.exp(elosses).tolist()))
     params['best_id']  = int(np.argmin(np.exp(elosses)))

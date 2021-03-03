@@ -181,13 +181,12 @@ if __name__ == "__main__":
         #Eval the model
         model.eval()
 
-        eval_loss, eval_acc,eval_time = run_epoch(eval_set, model, 
+        eval_loss, eval_acc = run_epoch(eval_set, model, 
                         SimpleLossCompute(model.generator, criterion, None))
-        elapsed_time = elapsed_time + train_time + eval_time 
+        # elapsed_time = elapsed_time + train_time + eval_time 
 
         print(f'Epoch {epoch} : TLoss = {train_loss:.4f} , Tacc= {train_acc:.2f} \
             ELoss = {eval_loss:.4f}, Eacc = {eval_acc:.2f}, \
-            Elapsed Time = {elapsed_time:.1f}, \
             Lr (start of epoch) {model_opt._rate:.4f}')
 
         tlosses.append(train_loss)

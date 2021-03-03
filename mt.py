@@ -47,7 +47,7 @@ if __name__ == "__main__":
         help = "fraction of data to use as a validation set")
     parser.add_argument('--bs',default = 30 ,type = int, 
         help = 'batch size - no. sentences per batch')
-    parser.add_argument('--no_epochs',default = 10, type =int,
+    parser.add_argument('--no_epochs',default = 220, type =int,
         help = 'number of epochs for training')
     parser.add_argument("--no_units",default = 6,type=int,
         help = 'number of encoder decoder units to stack')
